@@ -1,13 +1,268 @@
+# import datetime
+# import random
+# from faker import Faker
+# from faker.providers import address, date_time, internet, passport, phone_number
+# import uuid
+
+# from td7.custom_types import Records
+
+# PHONE_PROBABILITY = 0.7
+
+# class DataGenerator:
+#     def __init__(self):
+#         """Instantiates faker instance"""
+#         self.fake = Faker()
+#         self.fake.add_provider(address)
+#         self.fake.add_provider(date_time)
+#         self.fake.add_provider(internet)
+#         self.fake.add_provider(phone_number)
+
+#     def generar_bosques(self, n=5) -> Records:
+#         return [
+#             {
+#                 "nombre": f"Bosque {self.fake.unique.word().capitalize()}",
+#                 "superficie": round(random.uniform(1000, 50000), 2)
+#             } for _ in range(n)
+#         ]
+
+#     def generar_afluencias_turisticas(self, bosques: Records, fechas: list[datetime.date]) -> Records:
+#         return [
+#             {
+#                 "fecha": fecha,
+#                 "nombre_bosque": bosque["nombre"],
+#                 "cant_turistas": random.randint(0, 5000)
+#             }
+#             for bosque in bosques
+#             for fecha in fechas
+#         ]
+
+#     def generar_poligonos(self, bosques: Records) -> Records:
+#         return [
+#             {
+#                 "id_poligono": i + 1,
+#                 "nombre_bosque": bosque["nombre"]
+#             }
+#             for i, bosque in enumerate(bosques)
+#         ]
+
+#     def generar_coordenadas(self, poligonos: Records, n_coord=5) -> Records:
+#         coordenadas = []
+#         for poligono in poligonos:
+#             for i in range(n_coord):
+#                 coordenadas.append({
+#                     "latitud": round(random.uniform(-90, 90), 6),
+#                     "longitud": round(random.uniform(-180, 180), 6),
+#                     "id_poligono": poligono["id_poligono"],
+#                     "n_coordenadas": i
+#                 })
+#         return coordenadas
+
+#     def generar_incendios_forestales(self, bosques: Records, n=5) -> Records:
+#         incendios = []
+#         for _ in range(n):
+#             bosque = random.choice(bosques)
+#             start = self.fake.date_time_between(start_date="-1y", end_date="now")
+#             end = start + datetime.timedelta(hours=random.randint(1, 72))
+#             incendios.append({
+#                 "ts_inicio": start,
+#                 "ts_fin": end,
+#                 "nombre_bosque": bosque["nombre"],
+#                 "estacion": random.choice(["verano", "otoño", "invierno", "primavera"]),
+#                 "hect_quemadas": round(random.uniform(0.5, 1000), 2),
+#                 "latitud_inicio": round(random.uniform(-90, 90), 6),
+#                 "longitud_inicio": round(random.uniform(-180, 180), 6)
+#             })
+#         return incendios
+
+#     def generar_indices_gli(self, bosques: Records, fechas: list[datetime.date]) -> Records:
+#         return [
+#             {
+#                 "fecha": fecha,
+#                 "nombre_bosque": bosque["nombre"],
+#                 "valor_gli": round(random.uniform(-1, 1), 3),
+#                 "valor_rojo": round(random.uniform(0, 1), 3),
+#                 "valor_azul": round(random.uniform(0, 1), 3),
+#                 "valor_verde": round(random.uniform(0, 1), 3),
+#             }
+#             for bosque in bosques
+#             for fecha in fechas
+#         ]
+
+#     def generar_indices_savi(self, bosques: Records, fechas: list[datetime.date]) -> Records:
+#         return [
+#             {
+#                 "fecha": fecha,
+#                 "nombre_bosque": bosque["nombre"],
+#                 "valor_savi": round(random.uniform(0, 1), 3)
+#             }
+#             for bosque in bosques
+#             for fecha in fechas
+#         ]
+
+#     def generar_partidos(self, n=5) -> Records:
+#         return [
+#             {
+#                 "nombre": self.fake.unique.city(),
+#                 "densidad_poblacional": round(random.uniform(10, 1000), 2),
+#                 "superficie_total": round(random.uniform(100, 10000), 2)
+#             } for _ in range(n)
+#         ]
+
+#     def generar_bosques_en_partidos(self, bosques: Records, partidos: Records) -> Records:
+#         return [
+#             {
+#                 "nombre_bosque": bosque["nombre"],
+#                 "nombre_partido": random.choice(partidos)["nombre"]
+#             }
+#             for bosque in bosques
+#         ]
+
+#     def generar_estaciones_metereologicas(self, partidos: Records) -> Records:
+#         return [
+#             {
+#                 "nombre": f"Estacion {i+1}",
+#                 "nombre_partido": partido["nombre"],
+#                 "calle": self.fake.street_name(),
+#                 "numero": self.fake.building_number(),
+#                 "mail": self.fake.email(),
+#                 "telefono": self.fake.phone_number()
+#             }
+#             for i, partido in enumerate(partidos)
+#         ]
+
+#     def generar_informes_metereologicos(self, estaciones: Records, n=10) -> Records:
+#         return [
+#             {
+#                 "timestamp": self.fake.date_time_between(start_date="-1y", end_date="now"),
+#                 "nombre_estacionMetereologica": est["nombre"],
+#                 "dir_viento": random.choice(["N", "S", "E", "O"]),
+#                 "vel_viento": round(random.uniform(0, 50), 2),
+#                 "precipitacion_6h": round(random.uniform(0, 100), 2),
+#                 "precipitacion12_h": round(random.uniform(0, 200), 2),
+#                 "humedad": round(random.uniform(0, 100), 2),
+#                 "temperatura": round(random.uniform(-10, 40), 2)
+#             }
+#             for est in estaciones
+#             for _ in range(n)
+#         ]
+
+#     def generar_comportamientos_incendios(self, incendios: Records, informes: Records) -> Records:
+#         comportamientos = []
+#         for incendio in incendios:
+#             for _ in range(2):
+#                 dia = incendio["ts_inicio"].date()
+#                 hora = self.fake.time()
+#                 informe = random.choice(informes)
+#                 comportamientos.append({
+#                     "nombre_bosque": incendio["nombre_bosque"],
+#                     "inicio_incendio": incendio["ts_inicio"],
+#                     "dia": dia,
+#                     "hora": hora,
+#                     "longitud_llamas": round(random.uniform(1, 10), 2),
+#                     "altura_llamas": round(random.uniform(1, 5), 2),
+#                     "humedad_comb_FFMC": round(random.uniform(0, 100), 2),
+#                     "humedad_comb_DMC": round(random.uniform(0, 100), 2),
+#                     "humedad_comb_DC": round(random.uniform(0, 100), 2),
+#                     "timestamp_informeMeteorologico": informe["timestamp"],
+#                     "nombre_estacionMetereologica": informe["nombre_estacionMetereologica"]
+#                 })
+#         return comportamientos
+
+#     def generar_bomberos(self, partidos: Records) -> Records:
+#         return [
+#             {
+#                 "nro_brigada": i+1,
+#                 "nombre_partido": partido["nombre"],
+#                 "tipo": random.choice(["oficial", "voluntario"]),
+#                 "cantidad_bomberos": random.randint(5, 100)
+#             }
+#             for i, partido in enumerate(partidos)
+#         ]
+
+#     def generar_bomberos_en_incendios(self, brigadas: Records, incendios: Records) -> Records:
+#         return [
+#             {
+#                 "nro_brigada": brigada["nro_brigada"],
+#                 "nombre_bosque": incendio["nombre_bosque"],
+#                 "inicio_incendio": incendio["ts_inicio"]
+#             }
+#             for brigada in brigadas
+#             for incendio in random.sample(incendios, k=min(2, len(incendios)))
+#         ]
+
+#     def generar_recursos(self) -> Records:
+#         tipos = ["agua", "helicóptero", "pala", "manguera", "brigadista"]
+#         return [
+#             {
+#                 "nombre": t.capitalize(),
+#                 "tipo": "material" if t != "brigadista" else "humano",
+#                 "descripcion": f"Recurso tipo {t}"
+#             }
+#             for t in tipos
+#         ]
+
+#     def generar_recursos_utilizados(self, recursos: Records, incendios: Records) -> Records:
+#         return [
+#             {
+#                 "nombre_recurso": recurso["nombre"],
+#                 "nombre_bosque": incendio["nombre_bosque"],
+#                 "inicio_incendio": incendio["ts_inicio"],
+#                 "cantidad": random.randint(1, 10)
+#             }
+#             for recurso in recursos
+#             for incendio in random.sample(incendios, k=min(2, len(incendios)))
+#         ]
+
+#     def generar_tacticas(self) -> Records:
+#         nombres = ["Ataque directo", "Ataque indirecto", "Monitoreo", "Enfriamiento"]
+#         return [
+#             {
+#                 "nombre": n,
+#                 "descripcion": f"Descripción de {n}"
+#             } for n in nombres
+#         ]
+
+#     def generar_tacticas_utilizadas(self, tacticas: Records, incendios: Records) -> Records:
+#         return [
+#             {
+#                 "nombre_tactica": tactica["nombre"],
+#                 "nombre_bosque": incendio["nombre_bosque"],
+#                 "inicio_incendio": incendio["ts_inicio"]
+#             }
+#             for tactica in tacticas
+#             for incendio in random.sample(incendios, k=min(2, len(incendios)))
+#         ]
+
+#     def generar_causas(self) -> Records:
+#         nombres = ["Rayo", "Quema intencional", "Accidente", "Fogata"]
+#         return [
+#             {
+#                 "nombre": n,
+#                 "tipo": "natural" if n == "Rayo" else "artificial",
+#                 "descripcion": f"Causa del incendio: {n}"
+#             } for n in nombres
+#         ]
+
+#     def generar_causas_incendios(self, causas: Records, incendios: Records) -> Records:
+#         return [
+#             {
+#                 "nombre_causa": random.choice(causas)["nombre"],
+#                 "nombre_bosque": incendio["nombre_bosque"],
+#                 "inicio_incendio": incendio["ts_inicio"]
+#             }
+#             for incendio in incendios
+#         ]
+
+
 import datetime
 import random
 from faker import Faker
 from faker.providers import address, date_time, internet, passport, phone_number
 import uuid
 
-from custom_types import Records
+from td7.custom_types import Records
 
 PHONE_PROBABILITY = 0.7
-
 
 class DataGenerator:
     def __init__(self):
@@ -16,180 +271,38 @@ class DataGenerator:
         self.fake.add_provider(address)
         self.fake.add_provider(date_time)
         self.fake.add_provider(internet)
-        self.fake.add_provider(passport)
         self.fake.add_provider(phone_number)
-
-    # --- 1. Datos Meteorológicos ---
-    def generar_datos_meteorologicos(self):
-        return {
-            "estacion": self.fake.city(),
-            "timestamp": self.fake.date_time_this_year(),
-            "temperatura": round(random.uniform(10, 45), 1),  # °C
-            "humedad": random.randint(20, 90),  # %
-            "direccion_viento": self.fake.random_element(["N", "NE", "E", "SE", "S", "SO", "O", "NO"]),
-            "velocidad_viento_kmh": round(random.uniform(5, 60), 1),
-            "precipitacion_6h_mm": round(random.uniform(0, 30), 1),
-            "precipitacion_12h_mm": round(random.uniform(0, 60), 1)
-        }
     
-    # --- 2. Reporte de Incendios ---
-    def generar_reporte_incendio(self):
-        superficie = round(random.uniform(0.1, 500), 2)
-        return {
-            "id_incendio": str(uuid.uuid4()),
-            "fecha": self.fake.date_between(start_date='-1y', end_date='today'),
-            "hora": self.fake.time(),
-            "localidad": self.fake.city(),
-            "estacion_del_anio": self.fake.random_element(["Verano", "Otoño", "Invierno", "Primavera"]),
-            "franja_horaria": self.fake.random_element(["Madrugada", "Mañana", "Tarde", "Noche"]),
-            "hectareas_quemadas": superficie,
-            "tactica_usada": self.fake.random_element(["Ataque directo", "Ataque indirecto", "Uso de agua", "Uso de tierra"]),
-            "dotacion": self.fake.random_element(["Bomberos oficiales", "Voluntarios"]),
-            "recursos": {
-                "personas": random.randint(5, 40),
-                "camiones": random.randint(1, 5),
-                "helicopteros": random.randint(0, 2)
-            }
-        }
+    def generar_bosques(self, cant_bosques) -> Records:
+        return [
+             {
+                "nombre": f"Bosque {self.fake.unique.word().capitalize()}",
+                "superficie": round(random.uniform(1000, 50000), 2)
+             } for _ in range(cant_bosques)
+        ]
     
-    # --- 3. Índices de vegetación ---
-    def generar_indices_vegetacion(self):
-        return {
-            "bosque_id": str(uuid.uuid4()),
-            "indice_SAVI": round(random.uniform(0.0, 1.0), 3),
-            "indice_GLI": {
-                "R": random.randint(0, 255),
-                "G": random.randint(0, 255),
-                "B": random.randint(0, 255)
-            }
-        }
-    
-    # --- 4. Datos sociales (turismo y densidad) ---
-    def generar_datos_sociales(self):
-        return {
-            "zona": self.fake.city(),
-            "afluencia_turistica_mensual": random.randint(500, 20000),
-            "densidad_poblacional_hab_km2": round(random.uniform(10, 500), 1)
-        }   
-            
-    def generate_people(self, n: int) -> Records:
-        """Generates n people.
-
-        Parameters
-        ----------
-        n : int
-            Number of people to generate.
-
-        Returns
-        -------
-        List[Dict[str, Any]]
-            List of dicts that include first_name, last_name, phone_number,
-            address, country, date_of_birth, passport_number and email.
-
-        Notes
-        -----
-        People are guaranteed to be unique only within a function call.
-        """
-        people = []
-        for _ in range(n):
-            people.append(
-                {
-                    "first_name": self.fake.unique.first_name(),
-                    "last_name": self.fake.unique.last_name(),
-                    "phone_number": self.fake.unique.phone_number(),
-                    "address": self.fake.unique.address(),
-                    "country": self.fake.unique.country(),
-                    "date_of_birth": self.fake.unique.date_of_birth(),
-                    "passport_number": self.fake.unique.passport_number(),
-                    "email": self.fake.unique.ascii_email(),
-                }
-            )
-        return people
-
-    def generate_sessions(
-        self,
-        people: list,
-        base_time: datetime.datetime,
-        window: datetime.timedelta,
-        n: int,
-    ) -> Records:
-        """Generates sessions for people.
-
-        Parameters
-        ----------
-        people : list
-            People to generate events for.
-        base_time : datetime.datetime
-            Base time for sessions.
-        window : datetime.timedelta
-            Time window for sessions. Events will fill
-            the whole window equidistantly.
-        n : int
-            Number of events to generate.
-
-        Returns
-        -------
-        List[Dict[str, Any]]
-            List of dicts for events including properties such as
-            person_passport_number, event_time, user_agent, session_id.
-
-        Notes
-        -----
-        Events can be considered to be unique across function calls
-        since a surrogate key is generated using UUID4.
-        """
-        sessions = []
-        frequency = window / n
-        for i in range(n):
-            person = people[random.randint(0, len(people)-1)]
-            if random.random() < PHONE_PROBABILITY:
-                useragent = self.fake.android_platform_token()
-            else:
-                useragent = self.fake.chrome()
-
-            sessions.append(
-                {
-                    "person_passport_number": person["passport_number"],
-                    "event_time": base_time + i * frequency,
-                    "user_agent": useragent,
-                    "session_id": str(uuid.uuid4()),
-                }
-            )
-        return sessions
-    
-        # --- Ejemplo de generación múltiple ---
-    def generar_datos(self,n=5):
-        for i in range(n):
-            print("=== Meteorología ===")
-            print(self.generar_datos_meteorologicos())
-            print("=== Incendio ===")
-            print(self.generar_reporte_incendio())
-            print("=== Vegetación ===")
-            print(self.generar_indices_vegetacion())
-            print("=== Sociales ===")
-            print(self.generar_datos_sociales())
-            print("\n------------------\n")
-            print("=== Personas ===")
-            personas = self.generate_people(5)
-            for persona in personas:
-                print(persona)
-            print("=== Sesiones ===")
-            base_time = datetime.datetime.now()
-            window = datetime.timedelta(days=1)
-            sesiones = self.generate_sessions(personas, base_time, window, 10)
-            for sesion in sesiones:
-                print(sesion)
+    def generar_incendios_forestales(self, bosques: Records, cant_incendios) -> Records:
+        incendios = []
+        for _ in range(cant_incendios):
+            bosque = random.choice(bosques)
+            inicio = self.fake.date_time_between(start_date="-1y", end_date="-1w")
+            final = inicio + datetime.timedelta(hours=random.randint(1, 156))
+            incendios.append({
+                "ts_inicio": inicio, "ts_fin": final, "nombre_bosque": bosque["nombre"],
+                "estacion": random.choice(["verano", "otoño", "invierno", "primavera"]),
+                "hect_quemadas": round(random.uniform(0.5, 1000), 2),
+                "latitud_inicio": round(random.uniform(-90, 90), 6),
+                "longitud_inicio": round(random.uniform(-180, 180), 6)
+            })
+            return incendios
+        
+    def generar_partidos(self, cant_partidos) -> Records:
+        return [
+            {
+                "nombre": self.fake.unique.city(),
+                "densidad_poblacional": round(random.uniform(10,1000), 2),
+                "superficie_total": round(random.uniform(100, 10000), 2)
+            } for _ in range(cant_partidos)
+        ]
     
     
-
-
-
-
-
-# Ejecutar ejemplo
-if __name__ == "__main__":
-    
-    data_generator = DataGenerator()
-    # Generar 3 conjuntos de datos
-    data_generator.generar_datos(3)
-

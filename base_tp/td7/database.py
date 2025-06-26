@@ -1,18 +1,14 @@
 import pandas as pd 
 from sqlalchemy import create_engine
 
-from custom_types import Records
-from config import POSTGRES_CONN_STRING
+from td7.custom_types import Records
+from td7.config import POSTGRES_CONN_STRING
 
 class Database:
     """Class to interact with the database."""
     def __init__(self, conn_string = POSTGRES_CONN_STRING):
         self.engine = create_engine(conn_string)
         self.connection = self.engine.connect()
-        if self.connection:
-            print("Database connection established successfully.")
-        else:
-            print("Failed to connect to the database.")
 
     def run_select(self, sql: str) -> Records:
         """Runs a select query and returns dict records.
