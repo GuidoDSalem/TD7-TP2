@@ -1,102 +1,156 @@
+# from airflow import DAG
+# from airflow.operators.python import PythonOperator
+# import pendulum
+# import datetime
+
+# from td7.data_generator import DataGenerator
+# from td7.schema import Schema
+
+# generator = DataGenerator()
+# schema = Schema()
+
+# with DAG(
+#     dag_id="cargar_datos_incendios",
+#     start_date=pendulum.datetime(2024, 6, 1, tz="UTC"),
+#     schedule_interval="@hourly",
+#     catchup=True,
+# ) as dag:
+
+#     def generar_partidos():
+#         partidos = generator.generar_partidos(5)
+#         schema.insert(partidos, "Partidos")
+
+#     def generar_bosques():
+#         bosques = generator.generar_bosques(5)
+#         schema.insert(bosques, "Bosques")
+
+#     def crear_estaciones():
+#         partidos = schema.get_partidos()
+#         estaciones = generator.generar_estaciones_metereologicas(partidos)
+#         schema.insert(estaciones, "EstacionesMetereologicas")
+
+#     def generar_recursos():
+#         recursos = generator.generar_recursos()
+#         schema.insert(recursos, "Recursos")
+
+#     def generar_tacticas():
+#         tacticas = generator.generar_tacticas()
+#         schema.insert(tacticas, "Tacticas")
+
+#     def generar_causas():
+#         causas = generator.generar_causas()
+#         schema.insert(causas, "Causas")
+
+#     def generar_bomberos():
+#         partidos = schema.get_partidos()
+#         brigadas = generator.generar_bomberos(partidos)
+#         schema.insert(brigadas, "Bomberos")
+
+#     def generar_informes(base_time: str):
+#         estaciones = schema.get_estaciones()
+#         informes = generator.generar_informes_metereologicos(
+#             estaciones,
+#             datetime.datetime.fromisoformat(base_time)
+#         )
+#         schema.insert(informes, "InformesMetereologicos")
+
+#     def generar_incendios(base_time: str):
+#         bosques = schema.get_bosques()
+#         incendios = generator.generar_incendios_forestales(
+#             bosques,
+#             datetime.datetime.fromisoformat(base_time)
+#         )
+#         schema.insert(incendios, "IncendiosForestales")
+
+#     # Tareas base
+#     t0a = PythonOperator(task_id="partidos", python_callable=generar_partidos)
+#     t0b = PythonOperator(task_id="bosques", python_callable=generar_bosques)
+
+#     # Catálogos y dependencias básicas
+#     t1 = PythonOperator(task_id="estaciones", python_callable=crear_estaciones)
+#     t2 = PythonOperator(task_id="recursos", python_callable=generar_recursos)
+#     t3 = PythonOperator(task_id="tacticas", python_callable=generar_tacticas)
+#     t4 = PythonOperator(task_id="causas", python_callable=generar_causas)
+#     t5 = PythonOperator(task_id="bomberos", python_callable=generar_bomberos)
+
+#     # Datos con fecha dinámica
+#     t6 = PythonOperator(
+#         task_id="informes",
+#         python_callable=generar_informes,
+#         op_kwargs={"base_time": "{{ ds }}"}
+#     )
+#     t7 = PythonOperator(
+#         task_id="incendios",
+#         python_callable=generar_incendios,
+#         op_kwargs={"base_time": "{{ ds }}"}
+#     )
+
+#     # Dependencias
+#     t0a >> [t1, t5]
+#     t0b >> t7
+#     [t1] >> t6
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 import pendulum
 import datetime
+
 from td7.data_generator import DataGenerator
 from td7.schema import Schema
 
-EVENTS_PER_DAY = 10_000
-
-
-def generate_data(base_time: str, n: int):
-    """Generates synth data and saves to DB.
-
-    Parameters
-    ----------
-    base_time: strpoetry export --without-hashes --format=requirements.txt > requirements.txt
-
-        Base datetime to start events from.
-    n : int
-        Number of events to generate.
-    """
-    
-
-
-
-
+generator = DataGenerator()
+schema = Schema()
 
 with DAG(
-    "fill_data",
-    start_date=pendulum.datetime(2024, 6, 1, tz="UTC"),
+    dag_id="prueba1",
+    start_date=pendulum.datetime(2025, 6, 1, tz="UTC"),
     schedule_interval="@hourly",
     catchup=True,
 ) as dag:
-    op = PythonOperator(
-        task_id="task",
-        python_callable=generate_data,
-        op_kwargs=dict(n=EVENTS_PER_DAY, base_time="{{ ds }}"),
-    )
-    
-    generator = DataGenerator()
-    schema = Schema()
-    
-    def crear_estaciones():
-        estaciones = generator.generate_estaciones(5)
-        schema.insert(estaciones, "estacion_meteorologica")
 
-    def generar_informes(base_time: str):
-        estaciones = schema.get_estaciones()  # trae IDs de estaciones existentes
-        informes = generator.generate_informes_meteorologicos(
-            estaciones,
-            datetime.fromisoformat(base_time)
-        )
-        schema.insert(informes, "informe_meteorologico")
+    def generar_partidos():
+        partidos = generator.generar_partidos(5)
+        schema.insert(partidos, "Partidos")
+
+    def generar_bosques():
+        bosques = generator.generar_bosques(5)
+        schema.insert(bosques, "Bosques")
+
+    # def generar_estaciones():
+    #     partidos = schema.get_partidos()
+    #     estaciones = generator.generar_estaciones_(partidos)
+    #     schema.insert(estaciones, "EstacionesMetereologicas")
+
+    # def generar_informes(base_time: str):
+    #     estaciones = schema.get_estaciones()
+    #     informes = generator.generar_informes_metereologicos(
+    #         estaciones,
+    #         datetime.datetime.fromisoformat(base_time)
+    #     )
+    #     schema.insert(informes, "InformesMetereologicos")
 
     def generar_incendios(base_time: str):
         bosques = schema.get_bosques()
-        incendios = generator.generate_incendios_forestales(
+        incendios = generator.generar_incendios_forestales(
             bosques,
-            datetime.fromisoformat(base_time)
+            datetime.datetime.fromisoformat(base_time)
         )
-        schema.insert(incendios, "incendio_forestal")
+        schema.insert(incendios, "IncendiosForestales")
 
-    def generar_recursos():
-        incendios = schema.get_incendios_activos()
-        recursos = generator.generate_recursos(incendios)
-        schema.insert(recursos, "recurso")
-
-    def generar_brigadas():
-        incendios = schema.get_incendios_activos()
-        brigadas = generator.generate_brigadas(incendios)
-        schema.insert(brigadas, "brigada_bomberos")
-
-
-    t1 = PythonOperator(
-        task_id="crear_estaciones",
-        python_callable=crear_estaciones
-    )
-
-    t2 = PythonOperator(
-        task_id="generar_informes_meteorologicos",
-        python_callable=generar_informes,
-        op_kwargs={"base_time": "{{ ds }}"}
-    )
-
-    t3 = PythonOperator(
-        task_id="generar_incendios",
+    t1 = PythonOperator(task_id="partidos", python_callable=generar_partidos)
+    t2 = PythonOperator(task_id="bosques", python_callable=generar_bosques)
+    # t3 = PythonOperator(task_id="estaciones", python_callable=generar_estaciones)
+    # t4 = PythonOperator(
+    #     task_id="informes",
+    #     python_callable=generar_informes,
+    #     op_kwargs={"base_time": "{{ ds }}"}
+    # )
+    t5 = PythonOperator(
+        task_id="incendios",
         python_callable=generar_incendios,
         op_kwargs={"base_time": "{{ ds }}"}
     )
 
-    t4a = PythonOperator(
-        task_id="generar_recursos",
-        python_callable=generar_recursos
-    )
-
-    t4b = PythonOperator(
-        task_id="generar_brigadas",
-        python_callable=generar_brigadas
-    )
-
-    # Definición del flujo
-    t1 >> t2 >> t3 >> [t4a, t4b]
+    # t1 >> t3 >> t4
+    t1
+    t2 >> t5
