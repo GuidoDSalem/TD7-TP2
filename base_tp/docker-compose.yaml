@@ -50,7 +50,8 @@ services:
       - PG_DB_USER=$POSTGRES_USER
       - PG_DB_PASSWORD=$POSTGRES_PASSWORD
       - PG_DB_DBNAME=$POSTGRES_DB_NAME
-    command: --help
+    entrypoint: ["bash"]
+    command: ["-c", "while true; do sleep 30; done;"]
     depends_on:
       postgres:
         condition: service_healthy
