@@ -8,7 +8,7 @@ class Schema:
     
     def get_bosques(self) -> Records:
         return self.db.run_select("SELECT * FROM Bosques")
-
+    
     def get_afluencias(self, nombre_bosque: str) -> Records:
         query = "SELECT * FROM AfluenciasTuristicas"
         if nombre_bosque:

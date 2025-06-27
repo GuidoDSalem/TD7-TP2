@@ -47,7 +47,7 @@ def copy_docs(project_dir: str):
 with DAG(
     "run_dbt",
     default_args=DEFAULT_ARGS,
-    schedule=None,  # TODO: complete aquí con lo que considere
+    schedule="@hourly", #
     catchup=False,
     max_active_runs=1,
     tags=["dbt"],
@@ -73,7 +73,7 @@ with DAG(
         execution_config=ExecutionConfig(execution_mode=ExecutionMode.LOCAL),
         render_config=RenderConfig(
             emit_datasets=False, test_behavior=TestBehavior.AFTER_EACH, dbt_deps=True
-        ),
+        )
     )
 
     generate_dbt_docs = DbtDocsOperator(
