@@ -1,20 +1,34 @@
 version: 2
 
 models:
-  - name: my_first_dbt_model
-    description: "A starter dbt model"
+  - name: incendios
+    description: "Fuente inicial de incendios"
     columns:
       - name: id
         description: "The primary key for this table"
-        data_tests:
-          - unique
-          - not_null
 
-  - name: my_second_dbt_model
-    description: "A starter dbt model"
+  - name: mpartidos
+    description: "Información de partidos"
+    columns:
+      - name: id
+        description: "Clave primaria del partido"
+
+  - name: bosquespartidos
+    description: "Datos de bosques por partido"
+    columns:
+      - name: id
+        description: "Clave primaria del registro"
+  
+  - name: incendios_por_mes
+    description: "Se generan las vistas de incendios por mes por partido"
     columns:
       - name: id
         description: "The primary key for this table"
-        data_tests:
-          - unique
-          - not_null
+
+  - name: partidos_con_mas_incendios
+    description: "Se generan las vistas de los partidos que tienen mas incendios"
+    columns:
+      - name: id
+        description: "The primary key for this table"
+  
+

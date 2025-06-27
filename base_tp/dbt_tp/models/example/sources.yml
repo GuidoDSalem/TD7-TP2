@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: data_incendios
+    database: postgres
+    schema: public
+    tables:
+      - name: bosques
+      - name: partidos
+      - name: bosquesenpartidos
+      - name: incendiosforestales
+      - name: estacionesmeteorologicas
+      - name: informesmeteorologicos
